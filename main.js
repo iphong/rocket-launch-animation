@@ -7,8 +7,8 @@ void function () {
 
 	const cloudAnim = new Tween(3000, 0, 1, 'linear')
 	const rocketAnim = new Tween(5000, 200, 0, 'easeOutElastic')
-	// const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'linear')
 	const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'easeOutExpo')
+	// const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'linear')
 	// const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'easeOutQuad')
 
 	canvas.width = window.innerWidth
@@ -29,7 +29,7 @@ void function () {
 		windAngle: 90,
 		windSpeed: 0.18,
 		invert: 0
-	}).stop()
+	}, drawParticle).stop()
 	let smoke = new Emitter(canvas, canvas.width / 2, canvas.height / 2, {
 		size: 120,
 		count: 2,
@@ -43,13 +43,20 @@ void function () {
 		windAngle: 90,
 		windSpeed: 0,
 		invert: 1
-	}).stop()
+	}, drawParticle).stop()
 
+	function drawParticle(p) {
+		if (p.pos.y - p.size > canvas.height || p.pos.y + p.size <= 0) return this
+		ctx.beginPath()
+		ctx.arc(Math.round(p.pos.x), Math.round(p.pos.y), Math.round(p.radius), 0, 360)
+		ctx.fillStyle = 'rgba(255,255,255,1)'
+		ctx.fill()
+	}
 	function draw() {
-		let cloudTween = cloudAnim.tween
+		let cloudTween = cloudAnim.value
 		ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-		smoke.y = rocketY + smokeAnim.tween + rocketAnim.tween
+		smoke.y = rocketY + smokeAnim.value + rocketAnim.value
 		smoke.x = smoke.x * 0.97 + mouseX * 0.03
 		cloud.x = cloud.x * 0.97 + mouseX * 0.03
 
@@ -72,12 +79,10 @@ void function () {
 	}
 	
 	new Sequence({
-		0: () => {
-			
-		},
+		0: () => draw(),
 		190: () => rocketAnim.start(),
 		200: () => smoke.start(),
-		// 300: () => cloud.start(),
+		300: () => cloud.start(),
 	})
 
 	let launched = false

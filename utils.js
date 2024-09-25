@@ -1,3 +1,8 @@
+function Sequence(actions) {
+	Object.entries(actions).forEach(([delay, action]) => {
+		setTimeout(action, parseInt(delay))
+	})
+}
 class Tween {
 	constructor(duration = 1000, from = 0, to = 1, easing = 'linear') {
 		this.from = from
@@ -8,7 +13,7 @@ class Tween {
 	start() {
 		this.time = Date.now()
 	}
-	get tween() {
+	get value() {
 		if (!this.time) return this.from
 		var now = Date.now()
 		var lapsed = Math.min(now - this.time, this.duration)
@@ -106,20 +111,20 @@ class Particle {
 		this.pos.add(this.vel)
 		if (this.pos.x - this.size > this.canvas.width || this.pos.x + this.size <= 0) this.life = 0
 		if (this.pos.y - this.size > this.canvas.height) this.life = 0
-		this.render()
-	}
-	render() {
-		if (this.pos.y - this.size > this.canvas.height || this.pos.y + this.size <= 0) return this
-		this.context.beginPath()
-		this.context.arc(Math.round(this.pos.x), Math.round(this.pos.y), Math.round(this.radius), 0, 360)
-		this.context.fillStyle = 'rgba(255,255,255,1)'
-		this.context.fill()
 	}
 }
 
 class Emitter {
-
-	constructor(canvas = window.canvas, x = 0, y = 0, props = {}) {
+	/**
+	 * 
+	 * @param {Number} initial X position
+	 * @param {Number} initial Y position
+	 * @param {Object} emitter properties
+	 * @param {Function} particle render function
+	 */
+	constructor(canvas, x = 0, y = 0, props = {}, render = () => {}) {
+		if (canvas instanceof HTMLCanvasElement === false) throw "param must be HTML canvas element"
+		if (typeof render != 'function') throw "render param must be a function"
 		this.props = {
 			size: 200,
 			count: 4,
@@ -141,6 +146,7 @@ class Emitter {
 		this.lastTime = 0
 		this.context = canvas.getContext('2d')
 		this.emitting = true
+		this.render = render
 	}
 	prop(key, val) {
 		switch (true) {
@@ -162,6 +168,7 @@ class Emitter {
 		this.particles = this.particles.filter(p => {
 			p.setForce(Vector.fromAngle(this.props.windAngle, this.props.windSpeed))
 			p.loop()
+			this.render(p)
 			return p.life > 0
 		})
 		if (!this.emitting) return this
@@ -240,8 +247,3 @@ var Easing = function () {
 	return easings
 }()
 
-function Sequence(actions) {
-	Object.entries(actions).forEach(([delay, action]) => {
-		setTimeout(action, parseInt(delay))
-	})
-}
