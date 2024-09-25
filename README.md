@@ -1,2 +1,7 @@
-# rocket-launch-animation-js
-Rocket Launch Animation using Javascript
+# Rocket Launch Animation Javascript
+
+## Techniques used
+
+- HTML Canvas
+- Animation Tween
+- Particles Emitter 
