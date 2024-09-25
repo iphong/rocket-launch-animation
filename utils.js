@@ -90,7 +90,6 @@ class Particle {
 	constructor(canvas = window.canvas, x = 0, y = 0, props = {}) {
 		this.props = props
 		this.canvas = canvas
-		this.context = canvas.getContext('2d')
 		this.life = 1
 		this.size = Vector.randomRange(props.size / 2, props.size)
 		this.angle = Vector.randomRange(props.angle - props.spread / 2, props.angle + props.spread / 2)
@@ -144,7 +143,6 @@ class Emitter {
 		this.canvas = canvas
 		this.particles = []
 		this.lastTime = 0
-		this.context = canvas.getContext('2d')
 		this.emitting = true
 		this.render = render
 	}

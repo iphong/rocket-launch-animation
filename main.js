@@ -1,25 +1,33 @@
 void function () {
-	let canvas = document.querySelector('#canvas')
-	let rocket = document.querySelector('#rocket')
+	const ROCKET_HOVERING_HEIGHT = 200
 
-	let mouseX = window.innerWidth / 2
+	const canvas = document.querySelector('#canvas')
+	const rocket = document.querySelector('#rocket')
+
 	let ctx = canvas.getContext('2d')
-
-	const cloudAnim = new Tween(3000, 0, 1, 'linear')
-	const rocketAnim = new Tween(5000, 200, 0, 'easeOutElastic')
-	const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'easeOutExpo')
-	// const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'linear')
-	// const smokeAnim = new Tween(7000, 0, -canvas.height * 5, 'easeOutQuad')
-
 	canvas.width = window.innerWidth
 	canvas.height = window.innerHeight
 
-	let rocketY = canvas.height - 200
+	let mouseX = window.innerWidth / 2
+	let rocketY = canvas.height - ROCKET_HOVERING_HEIGHT
+	let PAUSED = false
 
-	let cloud = new Emitter(canvas, canvas.width / 2, canvas.height - 20, {
+	// Motion tween for rocket enters hovering state
+	const rocketAnim = new Tween(5000, 200, 0, 'easeOutElastic')
+	// const rocketAnim = new Tween(1000, 200, 0, 'linear')
+
+	// Motion tween for when rocket launches away state
+	const smokeAnim = new Tween(3000, 0, -(canvas.height), 'easeOutExpo')
+	// const smokeAnim = new Tween(1000, 0, -(canvas.height), 'linear')
+
+	// This motion tween scales the cloud when launches
+	const cloudAnim = new Tween(1000, 0, 1, 'linear')
+
+	// Particles emitter for white cloud at the bottom
+	let cloud = new Emitter(canvas, canvas.width / 2, canvas.height, {
 		size: 75,
 		count: 2,
-		rate: 40,
+		rate: 60,
 		speed: 1,
 		fade: 1,
 		angle: -90,
@@ -30,6 +38,8 @@ void function () {
 		windSpeed: 0.18,
 		invert: 0
 	}, drawParticle).stop()
+
+	// Particles Emitter for shooting out at the bottom of the rocket
 	let smoke = new Emitter(canvas, canvas.width / 2, canvas.height / 2, {
 		size: 120,
 		count: 2,
@@ -45,6 +55,7 @@ void function () {
 		invert: 1
 	}, drawParticle).stop()
 
+	// Draw particles
 	function drawParticle(p) {
 		if (p.pos.y - p.size > canvas.height || p.pos.y + p.size <= 0) return this
 		ctx.beginPath()
@@ -52,35 +63,45 @@ void function () {
 		ctx.fillStyle = 'rgba(255,255,255,1)'
 		ctx.fill()
 	}
-	function draw() {
-		let cloudTween = cloudAnim.value
-		ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-		smoke.y = rocketY + smokeAnim.value + rocketAnim.value
-		smoke.x = smoke.x * 0.97 + mouseX * 0.03
-		cloud.x = cloud.x * 0.97 + mouseX * 0.03
+	// Main render loop, fires every screen refresh
+	function loop() {
+		if (!PAUSED) {
+			ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-		cloud.prop({
-			size: 60 + cloudTween * 250,
-			speed: 4 + cloudTween * 4,
-			rate: 70 + cloudTween * 70
-		})
+			// Set the y position of the smoke and cloud particles source
+			smoke.y = rocketY + smokeAnim.value + rocketAnim.value
 
-		cloud.loop()
-		smoke.loop()
-		
-		let tilt = (mouseX - smoke.x) / canvas.width * 45
-		
-		rocket.style.top = smoke.y + 'px'
-		rocket.style.left = smoke.x + 'px'
-		rocket.style.transform = `rotate3d(0, 0, 1, ${tilt}deg) translate3d(-50%, -110%, 0)`
+			// Set the x position of the smoke and cloud particles source
+			smoke.x = smoke.x * 0.97 + mouseX * 0.03
+			cloud.x = cloud.x * 0.97 + mouseX * 0.03
 
-		requestAnimationFrame(draw)
+
+			// Set the position for the rocket and it's tilt angle
+			let tilt = (mouseX - smoke.x) / canvas.width * 45
+			rocket.style.top = smoke.y + 'px'
+			rocket.style.left = smoke.x + 'px'
+			rocket.style.transform = `rotate3d(0, 0, 1, ${tilt}deg) translate3d(-50%, -110%, 0)`
+
+			// When the cloud animation starts at rocket launch
+			// value of each particles scale up quickly to fill the screen
+			// This does nothing when rocket is hovering
+			cloud.prop({
+				size: 60 + cloudAnim.value * 250,
+				speed: 4 + cloudAnim.value * 4,
+				rate: 70 + cloudAnim.value * 70
+			})
+
+			cloud.loop()
+			smoke.loop()
+		}
+
+		requestAnimationFrame(loop)
 	}
-	
+
 	new Sequence({
-		0: () => draw(),
-		190: () => rocketAnim.start(),
+		0: () => loop(),
+		100: () => rocketAnim.start(),
 		200: () => smoke.start(),
 		300: () => cloud.start(),
 	})
@@ -132,11 +153,9 @@ void function () {
 	window.onresize = function (e) {
 		canvas.width = window.innerWidth
 		canvas.height = window.innerHeight
-		cloud.y = canvas.height - 20
-		rocketY = canvas.height - 180
+		cloud.y = canvas.height
+		rocketY = canvas.height - ROCKET_HOVERING_HEIGHT
 		mouseX = canvas.width / 4 + canvas.width / 2
-
-		// welcome[0].style.height = wHeight * 0.45 - 60 + 'px';
 	}
 	window.ontouchmove = function (e) {
 		mouseX = canvas.width / 4 + e.pageX / 2
@@ -144,4 +163,9 @@ void function () {
 	window.onmousemove = function (e) {
 		mouseX = canvas.width / 4 + e.pageX / 2
 	}
+	addEventListener('keydown', e => {
+		if (e.key === ' ') {
+			PAUSED = !PAUSED
+		}
+	})
 }()
