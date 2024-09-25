@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Title</title>
+	<style>
+		body {
+			padding: 0;
+			margin: 0;
+		}
+		#rocket {
+			position: fixed;
+			background-color: rgba(255, 255, 255);
+			width: 60px;
+			height: 100px;
+			border-radius: 50%;
+		}
+		#canvas {
+			background-color: rgb(230, 155, 102);
+		}
+		#canvas.faded {
+			background-color: white;
+			transition: all 10s;
+		}
+	</style>
+</head>
+<body>
+<div id="rocket"></div>
+<canvas id="canvas"></canvas>
+<script src="particles.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
