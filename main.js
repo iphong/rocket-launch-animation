@@ -102,7 +102,7 @@ void function () {
 	new Sequence({
 		0: () => loop(),
 		100: () => rocketAnim.start(),
-		200: () => smoke.start(),
+		110: () => smoke.start(),
 		300: () => cloud.start(),
 	})
 
