@@ -125,18 +125,18 @@ class Emitter {
 		if (canvas instanceof HTMLCanvasElement === false) throw "param must be HTML canvas element"
 		if (typeof render != 'function') throw "render param must be a function"
 		this.props = {
-			size: 200,
-			count: 4,
-			rate: 50,
-			speed: 4,
-			fade: 3,
+			size: 200, // initial size of the particle
+			count: 4, // Number of particles to generate per shoot out
+			rate: 50, // milliseconds to shot out particles, lower is faster
+			speed: 4, // initial speed of the particle, higher is faster
+			fade: 3, // lifespan of the particles
 			invert: 1,
-			angle: -90,
-			spread: 15,
-			bounceX: 1,
-			bounceY: 1,
-			windAngle: 0,
-			windSpeed: 0.03,
+			angle: -90, // shooting angle if the particles
+			spread: 15, // spread angle of the particles from the shooting angle
+			bounceX: 1, // Multiplier factor when particle hits horizontal wall
+			bounceY: 1, // Multiplier factor when particle hits verticle wall
+			windAngle: 90, // Wind affector angle 0=right 90=down 180=left 270=up
+			windSpeed: 0.03, // Multiplier factor for wind speed
 			...props
 		}
 		this.pos = new Vector(x, y)

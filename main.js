@@ -24,7 +24,7 @@ void function () {
 	const cloudAnim = new Tween(1000, 0, 1, 'linear')
 
 	// Particles emitter for white cloud at the bottom
-	let cloud = new Emitter(canvas, canvas.width / 2, canvas.height, {
+	let cloudEmitter = new Emitter(canvas, canvas.width / 2, canvas.height, {
 		size: 75,
 		count: 2,
 		rate: 60,
@@ -40,17 +40,17 @@ void function () {
 	}, drawParticle).stop()
 
 	// Particles Emitter for shooting out at the bottom of the rocket
-	let smoke = new Emitter(canvas, canvas.width / 2, canvas.height / 2, {
+	let smokeEmitter = new Emitter(canvas, canvas.width / 2, canvas.height / 2, {
 		size: 120,
 		count: 2,
-		rate: 30,
+		rate: 6,
 		speed: 6,
 		fade: 7,
 		angle: 90,
 		spread: 15,
 		bounceX: 1,
 		bounceY: 1,
-		windAngle: 90,
+		windAngle: 0,
 		windSpeed: 0,
 		invert: 1
 	}, drawParticle).stop()
@@ -60,7 +60,7 @@ void function () {
 		if (p.pos.y - p.size > canvas.height || p.pos.y + p.size <= 0) return this
 		ctx.beginPath()
 		ctx.arc(Math.round(p.pos.x), Math.round(p.pos.y), Math.round(p.radius), 0, 360)
-		ctx.fillStyle = 'rgba(255,255,255,1)'
+		ctx.fillStyle = 'rgba(255,0,0,0.65)'
 		ctx.fill()
 	}
 
@@ -70,30 +70,32 @@ void function () {
 			ctx.clearRect(0, 0, canvas.width, canvas.height)
 
 			// Set the y position of the smoke and cloud particles source
-			smoke.y = rocketY + smokeAnim.value + rocketAnim.value
+			smokeEmitter.y = rocketY + smokeAnim.value + rocketAnim.value
 
 			// Set the x position of the smoke and cloud particles source
-			smoke.x = smoke.x * 0.97 + mouseX * 0.03
-			cloud.x = cloud.x * 0.97 + mouseX * 0.03
+			smokeEmitter.x = smokeEmitter.x * 0.97 + mouseX * 0.03
+			cloudEmitter.x = cloudEmitter.x * 0.97 + mouseX * 0.03
+			// smokeEmitter.x = mouseX
+			// cloudEmitter.x = mouseX
 
 
 			// Set the position for the rocket and it's tilt angle
-			let tilt = (mouseX - smoke.x) / canvas.width * 45
-			rocket.style.top = smoke.y + 'px'
-			rocket.style.left = smoke.x + 'px'
+			let tilt = (mouseX - smokeEmitter.x) / canvas.width * 45
+			rocket.style.top = smokeEmitter.y + 'px'
+			rocket.style.left = smokeEmitter.x + 'px'
 			rocket.style.transform = `rotate3d(0, 0, 1, ${tilt}deg) translate3d(-50%, -110%, 0)`
 
 			// When the cloud animation starts at rocket launch
 			// value of each particles scale up quickly to fill the screen
 			// This does nothing when rocket is hovering
-			cloud.prop({
+			cloudEmitter.prop({
 				size: 60 + cloudAnim.value * 250,
 				speed: 4 + cloudAnim.value * 4,
 				rate: 70 + cloudAnim.value * 70
 			})
 
-			cloud.loop()
-			smoke.loop()
+			cloudEmitter.loop()
+			smokeEmitter.loop()
 		}
 
 		requestAnimationFrame(loop)
@@ -102,8 +104,8 @@ void function () {
 	new Sequence({
 		0: () => loop(),
 		100: () => rocketAnim.start(),
-		110: () => smoke.start(),
-		300: () => cloud.start(),
+		110: () => smokeEmitter.start(),
+		300: () => cloudEmitter.start(),	
 	})
 
 	let launched = false
@@ -112,7 +114,7 @@ void function () {
 		launched = true
 		new Sequence({
 			0: () => {
-				smoke.prop({
+				smokeEmitter.prop({
 					size: 250,
 					spread: 45,
 					count: 8,
@@ -120,20 +122,20 @@ void function () {
 				})
 			},
 			900: () => {
-				cloud.prop({
+				cloudEmitter.prop({
 					windSpeed: 0.4,
 					bounceY: -0.1
 				})
 			},
 			1000: () => {
-				smoke.prop({
+				smokeEmitter.prop({
 					size: 100,
-					rate: 20,
+					rate: 10,
 					spread: 8,
 					speed: 5,
 					count: 5
 				})
-				cloud.prop({
+				cloudEmitter.prop({
 					windSpeed: 0.05,
 					bounceY: -0.6,
 					fade: 5
@@ -142,7 +144,7 @@ void function () {
 			1010: () => smokeAnim.start(),
 			1160: () => cloudAnim.start(),
 			1100: () => {
-				cloud.prop({
+				cloudEmitter.prop({
 					spread: 180,
 					fade: 1
 				})
@@ -153,7 +155,7 @@ void function () {
 	window.onresize = function (e) {
 		canvas.width = window.innerWidth
 		canvas.height = window.innerHeight
-		cloud.y = canvas.height
+		cloudEmitter.y = canvas.height
 		rocketY = canvas.height - ROCKET_HOVERING_HEIGHT
 		mouseX = canvas.width / 4 + canvas.width / 2
 	}
