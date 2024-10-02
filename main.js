@@ -73,8 +73,10 @@ void function () {
 			smokeEmitter.y = rocketY + smokeAnim.value + rocketAnim.value
 
 			// Set the x position of the smoke and cloud particles source
+			// Using Low Pass Filter to smooth out mouse signal
 			smokeEmitter.x = smokeEmitter.x * 0.97 + mouseX * 0.03
 			cloudEmitter.x = cloudEmitter.x * 0.97 + mouseX * 0.03
+			// Without Low Pass Filter (LPF)
 			// smokeEmitter.x = mouseX
 			// cloudEmitter.x = mouseX
 
