@@ -5,8 +5,10 @@ void function () {
 	const rocket = document.querySelector('#rocket')
 
 	let ctx = canvas.getContext('2d')
-	canvas.width = window.innerWidth
-	canvas.height = window.innerHeight
+	let windowWidth = window.innerWidth
+	let windowHeight = window.innerHeight
+	canvas.width = windowWidth
+	canvas.height = windowHeight
 
 	let mouseX = window.innerWidth / 2
 	let rocketY = canvas.height - ROCKET_HOVERING_HEIGHT
@@ -24,7 +26,7 @@ void function () {
 	const cloudAnim = new Tween(1000, 0, 1, 'linear')
 
 	// Particles emitter for white cloud at the bottom
-	let cloudEmitter = new Emitter(canvas, canvas.width / 2, canvas.height, {
+	let cloudEmitter = new Emitter(canvas, windowWidth / 2, windowHeight, {
 		size: 75,
 		count: 2,
 		rate: 60,
@@ -40,7 +42,7 @@ void function () {
 	}, drawParticle).stop()
 
 	// Particles Emitter for shooting out at the bottom of the rocket
-	let smokeEmitter = new Emitter(canvas, canvas.width / 2, canvas.height / 2, {
+	let smokeEmitter = new Emitter(canvas, windowWidth / 2, windowHeight / 2, {
 		size: 120,
 		count: 2,
 		rate: 6,
@@ -67,7 +69,7 @@ void function () {
 	// Main render loop, fires every screen refresh
 	function loop() {
 		if (!PAUSED) {
-			ctx.clearRect(0, 0, canvas.width, canvas.height)
+			ctx.clearRect(0, 0, windowWidth, windowHeight)
 
 			// Set the y position of the smoke and cloud particles source
 			smokeEmitter.y = rocketY + smokeAnim.value + rocketAnim.value
@@ -82,7 +84,7 @@ void function () {
 
 
 			// Set the position for the rocket and it's tilt angle
-			let tilt = (mouseX - smokeEmitter.x) / canvas.width * 45
+			let tilt = (mouseX - smokeEmitter.x) / windowWidth * 45
 			rocket.style.top = smokeEmitter.y + 'px'
 			rocket.style.left = smokeEmitter.x + 'px'
 			rocket.style.transform = `rotate3d(0, 0, 1, ${tilt}deg) translate3d(-50%, -110%, 0)`
@@ -155,17 +157,19 @@ void function () {
 		})
 	}
 	window.onresize = function (e) {
-		canvas.width = window.innerWidth
-		canvas.height = window.innerHeight
-		cloudEmitter.y = canvas.height
-		rocketY = canvas.height - ROCKET_HOVERING_HEIGHT
-		mouseX = canvas.width / 4 + canvas.width / 2
+		windowWidth = window.innerWidth
+		windowHeight = window.innerHeight
+		canvas.width = windowWidth
+		canvas.height = windowHeight
+		cloudEmitter.y = windowHeight
+		rocketY = windowHeight - ROCKET_HOVERING_HEIGHT
+		mouseX = windowWidth / 4 + windowWidth / 2
 	}
 	window.ontouchmove = function (e) {
-		mouseX = canvas.width / 4 + e.pageX / 2
+		mouseX = windowWidth / 4 + e.pageX / 2
 	}
 	window.onmousemove = function (e) {
-		mouseX = canvas.width / 4 + e.pageX / 2
+		mouseX = windowWidth / 4 + e.pageX / 2
 	}
 	addEventListener('keydown', e => {
 		if (e.key === ' ') {
