@@ -62,7 +62,7 @@ void function () {
 		if (p.pos.y - p.size > canvas.height || p.pos.y + p.size <= 0) return this
 		ctx.beginPath()
 		ctx.arc(Math.round(p.pos.x), Math.round(p.pos.y), Math.round(p.radius), 0, 360)
-		ctx.fillStyle = 'rgba(255,0,0,0.65)'
+		ctx.fillStyle = 'rgb(223, 235, 250, 0.9)'
 		ctx.fill()
 	}
 
