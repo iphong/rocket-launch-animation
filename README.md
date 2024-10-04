@@ -4,6 +4,8 @@
 
 - HTML Canvas
 - Animation Tween
-- Particles Emitter 
+- Particles Emitter
+
+[DEMO](https://iphong.github.io/rocket-launch-animation/)
 
 ![image](./cover.png)
